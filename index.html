@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+        integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+    <title>Document</title>
+</head>
+
+<body>
+
+    <section class="container-fluid">
+
+        <div class="row">
+        <div id="para"></div>
+        <div>
+            <button onclick="Logout()">logout</button>
+        </div>
+            
+    </div>
+        <div class="row  d-flex justify-content-center align-items-center my-2">
+            <div class="col-2 justify-content-center align-items-center h3">
+                course ID
+            </div>
+            <div class="col-7 justify-content-center align-items-center my-2">
+                <input type="text" id="ID" style="width:70%" readonly>
+            </div>
+        </div>
+        <div class="row  d-flex justify-content-center align-items-center my-2">
+            <div class="col-2 justify-content-center align-items-center h3">
+                course Name
+            </div>
+            <div class="col-7 justify-content-center align-items-center my-2">
+                <input type="text" id="name" style="width:70%">
+            </div>
+        </div>
+        <div class="row  d-flex justify-content-center align-items-center my-2">
+            <div class="col-2 justify-content-center align-items-center h3">
+                final mark
+            </div>
+            <div class="col-7 justify-content-center align-items-center my-2">
+                <input type="text " id="mark" style="width:70%">
+            </div>
+        </div>
+        <div class="row  d-flex justify-content-center align-items-center my-2">
+            <div class="col-2 justify-content-center align-items-center h3">
+                Hours
+            </div>
+            <div class="col-7 justify-content-center align-items-center my-2">
+                <input type="text " id="hours" style="width:70%">
+            </div>
+        </div>
+        <div class="row  d-flex justify-content-center align-items-center my-2">
+            <div class="col-2 justify-content-center align-items-center h3">
+                course Name
+            </div>
+            <div class="col-7 justify-content-center align-items-center my-2">
+                <select class="form-control form-select w-25" id="avail">
+                    <option value="true">available</option>
+                    <option value="false">Not available</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-7 d-flex justify-content-center align-items-center my-2">
+            <button type="button" onclick="addNew()" class="btn btn-primary mt-3 mx-5">Add course</button>
+
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mx-5 d-flex justify-content-center">
+                <input type="checkbox" class="mx-2" onclick="available()" id="available"> available
+                <input type="checkbox" class="mx-2" onclick="notavailable()" id="notavailable"> not available
+            </div>
+        </div>
+    </section>
+    <section class="container-fluid">
+        <div class="output d-flex justify-content-center align-items-center my-2 mx-5">
+
+            <table id="corsdata" class="table table-light table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col"> Course Name</th>
+                        <th scope="col"> final mark</th>
+                        <th scope="col">hours</th>
+                        <th scope="col">availability</th>
+                    </tr>
+
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+
+        import { getFirestore, addDoc, collection, onSnapshot, getDoc, doc, deleteDoc, updateDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmMcEKWrE0tbweuAHin4yl2PsvwJNgvbk",
+            authDomain: "students-79239.firebaseapp.com",
+            projectId: "students-79239",
+            storageBucket: "students-79239.appspot.com",
+            messagingSenderId: "400928239359",
+            appId: "1:400928239359:web:3aee40bf0a2ab4d9b066ca",
+            measurementId: "G-6HVMDMYNPD"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const firestore = getFirestore(app);
+
+
+        window.addNew = addNew;
+        async function addNew() {
+            var ID = document.getElementById("ID").value;
+            var name = document.getElementById("name").value;
+            var mark = parseInt(document.getElementById("mark").value);
+            var hours = parseInt(document.getElementById("hours").value);
+            var avail = document.getElementById("avail").value;
+            let bool = document.getElementById('avail').value === "true" ? true : false
+            var course = {
+
+                name: name,
+                mark: mark,
+                hours: hours,
+                avail: bool 
+            };
+            console.log(course);
+
+            if (ID == "") {
+                var cors = await addDoc(collection(firestore, 'studentcourses'), course);
+                console.log(cors.id);
+            } else {
+                updateDoc(doc(firestore, 'studentcourses', ID), course);
+            }
+            clear();
+
+        }
+        function clear() {
+            document.getElementById("ID").innerHTML = "";
+            document.getElementById("name").innerHTML = "";
+            document.getElementById("mark").innerHTML = "";
+            document.getElementById("hours").innerHTML = "";
+        }
+
+
+        onSnapshot(collection(firestore, 'studentcourses'), (snapshot) => {
+            var tableBody = document.querySelector("#corsdata>tbody");
+            tableBody.innerHTML = "";
+            snapshot.forEach((doc) => {
+                showData(doc);
+            })
+
+        })
+
+        function showData(course) {
+            var courseData = course.data();
+            var tableBody = document.querySelector("#corsdata>tbody");
+            var row = `
+              <tr>
+                 <td>${course.id}</td>
+                 <td>${courseData.name}</td>
+                 <td>${courseData.mark}</td>
+                 <td>${courseData.hours}</td>
+                 <td>${courseData.avail}</td>
+                 <td>
+                 <button type="button" class="btn btn-warning" onclick="editCourse('${course.id}')"><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-danger" onclick="deleteCourse('${course.id}')"><i class="fas fa-trash-alt"></i></button>
+                 </td>
+              </tr>`
+            tableBody.innerHTML += row;
+        }
+
+
+        window.editCourse = editCourse;
+        async function editCourse(corsid) {
+            const corsdoc = await getDoc(doc(firestore, 'studentcourses', corsid));
+            var course = corsdoc.data();
+            document.getElementById("ID").value = corsid;
+            document.getElementById("name").value = course.name
+            document.getElementById("mark").value = course.mark;
+            document.getElementById("hours").value = course.hours;
+            document.getElementById("avail").value = course.avail;
+        }
+
+
+        window.deleteCourse = deleteCourse;
+        function deleteCourse(corsid) {
+            deleteDoc(doc(firestore, 'studentcourses', corsid));
+        }
+
+        window.available = available
+        async function available() {
+            var available = document.getElementById("available");
+
+            if (available.checked == true) {
+          
+                debugger;
+                console.log("imNhere");
+
+                var q = query(collection(firestore, 'studentcourses'),
+                 where('avail', '==', true),orderBy('mark')
+                 );
+               
+   
+
+
+                var queryResult = await getDocs(q);
+                console.log(queryResult);
+                var tableBody = document.querySelector("#corsdata>tbody");
+                tableBody.innerHTML = "";
+                queryResult.forEach((doc) => {
+                    var courseData = doc.data();
+                    console.log(doc.data())
+
+
+                    var row2 = `
+             <tr>
+               <td>${doc.id}</td>
+                <td>${courseData.name}</td>
+                <td>${courseData.mark}</td>
+                <td>${courseData.hours}</td>
+                <td>${courseData.avail}</td>
+                <td>
+                <button type="button" class="btn btn-warning" onclick="editCourse('${doc.id}')"><i class="fas fa-edit"></i></button>
+               <button type="button" class="btn btn-danger" onclick="deleteCourse('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+             </tr>`
+                    tableBody.innerHTML += row2;
+                })
+            } else {
+                onSnapshot(collection(firestore, 'studentcourses'), (snapshot) => {
+            var tableBody = document.querySelector("#corsdata>tbody");
+            tableBody.innerHTML = "";
+            snapshot.forEach((doc) => {
+                showData(doc);
+            })
+
+        })
+            }
+
+        }
+        window.notavailable = notavailable
+        async function notavailable() {
+            var notAvail = document.getElementById("notavailable");
+            if (notAvail.checked == true) {
+                debugger;
+                console.log("imNhere");
+
+                var q = query(collection(firestore, 'studentcourses'), where('avail', '==', false));
+                var queryResult = await getDocs(q);
+                console.log(queryResult);
+                var tableBody = document.querySelector("#corsdata>tbody");
+                tableBody.innerHTML = "";
+                queryResult.forEach((doc) => {
+                    var courseData = doc.data();
+                    console.log(doc.data())
+
+
+                    var row2 = `
+             <tr>
+               <td>${doc.id}</td>
+                <td>${courseData.name}</td>
+                <td>${courseData.mark}</td>
+                <td>${courseData.hours}</td>
+                <td>${courseData.avail}</td>
+                <td>
+                <button type="button" class="btn btn-warning" onclick="editCourse('${doc.id}')"><i class="fas fa-edit"></i></button>
+               <button type="button" class="btn btn-danger" onclick="deleteCourse('${doc.id}')"><i class="fas fa-trash-alt"></i></button>
+                </td>
+             </tr>`
+                    tableBody.innerHTML += row2;
+                })
+            } else {
+                onSnapshot(collection(firestore, 'studentcourses'), (snapshot) => {
+            var tableBody = document.querySelector("#corsdata>tbody");
+            tableBody.innerHTML = "";
+            snapshot.forEach((doc) => {
+                showData(doc);
+            })
+
+        })
+            }
+
+        }
+    </script>
+<script src="main.js" type="module"></script>
+</body>
+
+</html>
